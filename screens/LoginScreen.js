@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import CustomTextInput from '../components/CustomTextInput';
+import PasswordInput from '../components/PasswordInput';
 
 import { AuthContext } from '../navigation/AuthProvider';
-
-import firebase from '../database/firebase';
 
 export default function SignupScreen({navigation}) {
   const [email, setEmail] = useState('');
@@ -13,34 +13,32 @@ export default function SignupScreen({navigation}) {
 
   return (
     <View style={styles.container}>
-      <TextInput 
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
+      <CustomTextInput 
+        onChangeText={value => setEmail(value)}
         placeholder="E-mail"
         keyboardType="email-address"
         autoCapitalize="none"
+        width="90%"
+        icon="mail"
       />
-      <TextInput 
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Senha"
-        secureTextEntry
+      <PasswordInput 
+        onChangeText={value => setPassword(value)} 
+        width="90%"
       />
 
       <TouchableOpacity 
-        style={styles.button}
+        style={styles.loginButton}
         onPress={() => login(email, password)}
       >
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.loginButtonText}>Entrar</Text>
       </TouchableOpacity>
 
       <TouchableOpacity 
-        style={styles.button} 
+        style={styles.signupButton} 
         onPress={() => navigation.navigate("Signup")}
       >
-        <Text style={styles.buttonText}>Não tem uma conta? Cadastre-se</Text>
+        <Text style={styles.signupButtonText}>Não tem uma conta?</Text>
+        <Text style={styles.signupButtonTextSecondary}>Cadastre-se!</Text>
       </TouchableOpacity>
     </View>
   )
@@ -53,29 +51,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  input: {
-    width: '85%',
-    margin: 10,
-    padding: 15,
-    fontSize: 16,
-    borderColor: '#d3d3d3',
-    borderBottomWidth: 1,
-    textAlign: 'center'
-  },
-  button: {
+  loginButton: {
     marginTop: 30,
-    marginBottom: 20,
-    paddingVertical: 5,
+    marginBottom: 8,
+    paddingVertical: 14,
     alignItems: 'center',
-    backgroundColor: '#FFA611',
-    borderColor: '#FFA611',
-    borderWidth: 1,
+    backgroundColor: '#8395a7',
     borderRadius: 5,
-    width: 200
+    width: "80%"
   },
-  buttonText: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: '#fff'
+  loginButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: '#fff'
   },
+  signupButton: {
+    width: "80%",
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "center",
+  },
+  signupButtonText: {
+    lineHeight: 16
+  },
+  signupButtonTextSecondary: {
+    marginLeft: 5,
+    fontWeight: "700",
+    color: "#10ac84"
+  }
 });

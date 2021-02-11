@@ -1,11 +1,25 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 import firebase from '../database/firebase';
 
 import { StyleSheet, Text, View, Image, Button, TouchableOpacity } from 'react-native';
 import avatarImage from '../assets/avatar.jpg';
+import { Feather } from '@expo/vector-icons';
 
 export default function PostItem({postData, isLast}) {
+  const [name, setName] = useState("");
+  const [image, setImage] = useState(null);
+
+  React.useEffect(() => {
+    firebase.firestore().collection('users').doc(postData.userId).get().then(doc => {
+      if (doc.exists) {
+        const { name, avatar } = doc.data();
+        setName(name);
+        setImage(avatar);
+      }
+    })
+  }, [])
+
   const timeFromNowInMinutes = (time) => {
     if (time === null || time === undefined) {
       return "Criado há alguns segundos...";
@@ -23,21 +37,22 @@ export default function PostItem({postData, isLast}) {
   }
 
   const deletePostFromDatabase = async () => {
-    const dbRef = firebase.db.collection('posts').doc(postData.id);
+    const dbRef = firebase.firestore().collection('posts').doc(postData.id);
     await dbRef.delete();
   }
+
+  console.log("imageurl do post: ", image)
 
   return (
     <View style={isLast ? styles.containerLast : styles.container}>
       <View style={styles.header}>
-        <Image style={styles.avatarImg}source={avatarImage} />
+        <Image style={styles.avatarImg} source={image !== null ? {uri: image} : avatarImage} />
         <View style={styles.ctnInfo}>
-          <Text style={styles.postName}>Gabriel Silipi</Text>
+          <Text style={styles.postName}>{name !== "" ? name : "Usuário"}</Text>
           <Text style={styles.postTime}>{`${timeFromNowInMinutes(postData.postedAt)}`}</Text>
         </View>
         <TouchableOpacity onPress={deletePostFromDatabase} style={styles.btnDelete}>
-          <Text>X</Text>
-
+          <Feather name="delete" size={22} />
         </TouchableOpacity>
       </View>
       
@@ -76,10 +91,8 @@ const styles = StyleSheet.create({
   },
   btnDelete: {
     marginLeft: "auto", 
-    backgroundColor: "tomato", 
     height: 30, 
     width: 30, 
-    borderRadius: 50, 
     alignItems: "center", 
     justifyContent: "center",
   },

@@ -9,18 +9,18 @@ import { AuthContext } from '../navigation/AuthProvider';
 export default function HomeScreen({ route, navigation }) {
   const [posts, setPosts] = useState([]);
 
-  const { logout, user } = React.useContext(AuthContext);
+  const { user } = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    firebase.db.collection('posts').onSnapshot(querySnapshot => {
+    firebase.firestore().collection('posts').onSnapshot(querySnapshot => {
       const posts = [];
 
       querySnapshot.docs.forEach(doc => {
-        const { post } = doc.data();
+        const { post, userId } = doc.data();
 
         const postDate = doc.data() && doc.data().postedAt && doc.data().postedAt.toDate();
 
-        posts.push({id: doc.id, postText: post, postedAt: postDate});
+        posts.push({id: doc.id, userId: userId, postText: post, postedAt: postDate});
       });
 
       // Método para ordenar post por mais atual;
@@ -37,10 +37,10 @@ export default function HomeScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button title="Deslogar" onPress={logout} />
-      <Text>Bem vindo {user.uid}</Text>   
+      <Text>Bem vindo, {user.displayName}!</Text>
+
       {posts.length > 0 ? 
-          <ScrollView style={{flexGrow: 1}} contentContainerStyle={styles.ctnScrollView}>        
+        <ScrollView style={{flexGrow: 1}} contentContainerStyle={styles.ctnScrollView}>        
           {posts.map((post, i) => 
             <PostItem 
               key={i} 
@@ -52,7 +52,6 @@ export default function HomeScreen({ route, navigation }) {
         <Text>Nenhuma postagem encontrada.</Text>
       }
       
-
       <View style={styles.ctnBtnCreate}>
         <Button     
           title="Novo post"

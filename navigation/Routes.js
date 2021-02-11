@@ -20,9 +20,13 @@ export default function Routes() {
   }
 
   useEffect(() => {
-    const subscriber = firebase.firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
+
+  if (initializing) {
+    return null
+  }
 
   if (loading) {
     return <View><Text>Carregando</Text></View>;

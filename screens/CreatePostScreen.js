@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { StyleSheet, View, Text, Button, TextInput, ToastAndroid } from 'react-native';
 import firebase from '../database/firebase';
+import { AuthContext } from '../navigation/AuthProvider';
 
 export default function CreatePostScreen({ navigation, route }) {
   const [postText, setPostText] = useState('');
+  const { user } = useContext(AuthContext)
 
   const handleSave = () => {
     // Validações prévias (early returns):
@@ -28,9 +30,10 @@ export default function CreatePostScreen({ navigation, route }) {
 
   const addNewPostToDatabase = async () => {
     try {
-      await firebase.db.collection("posts").add({
-        postedAt: firebase.firebase.firestore.FieldValue.serverTimestamp(),
-        post: postText,   
+      await firebase.firestore().collection("posts").add({
+        postedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        post: postText,
+        userId: user.uid   
       })
     } catch (e) {
       ToastAndroid.showWithGravity(e, ToastAndroid.LONG, ToastAndroid.BOTTOM);
